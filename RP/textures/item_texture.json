@@ -1,0 +1,33 @@
+{
+	"resource_pack_name": "Stellar Forge",
+	"texture_name": "atlas.items",
+	"texture_data": {
+		"stellar_neonite_crystal": {
+			"textures": "textures/items/neonite_crystal"
+		},
+		"stellar_neonite_pickaxe": {
+			"textures": "textures/items/neonite_pickaxe"
+		},
+		"stellar_neonite_sword": {
+			"textures": "textures/items/neonite_sword"
+		},
+		"stellar_neonite_armor_helmet": {
+			"textures": "textures/items/neonite_armor_helmet"
+		},
+		"stellar_neonite_armor_chestplate": {
+			"textures": "textures/items/neonite_armor_chestplate"
+		},
+		"stellar_neonite_armor_leggings": {
+			"textures": "textures/items/neonite_armor_leggings"
+		},
+		"stellar_neonite_armor_boots": {
+			"textures": "textures/items/neonite_armor_boots"
+		},
+		"stellar_ga": {
+			"textures": "textures/items/ga"
+		},
+		"stellar_neonite_blaster": {
+			"textures": "textures/items/neonite_blaster"
+		}
+	}
+}

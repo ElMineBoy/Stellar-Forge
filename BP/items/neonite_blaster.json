@@ -1,0 +1,39 @@
+{
+	"format_version": "1.20.80",
+	"minecraft:item": {
+		"description": {
+			"identifier": "stellar:neonite_blaster",
+			"menu_category": {
+				"category": "equipment",
+				"group": "stellar:itemGroup.name"
+			}
+		},
+		"components": {
+			"minecraft:max_stack_size": 1,
+			"minecraft:icon": "stellar_neonite_blaster",
+			"minecraft:display_name": {
+				"value": "Neonite Blaster"
+			},
+			"stellar:use_modifiers": {
+				"sound": "mob.ghast.fireball",
+				"hasCooldown": true
+			},
+			"minecraft:durability": {
+				"max_durability": 500
+			},
+			"stellar:shoot_projectile": {
+				"projectileId": "stellar:custom_fireball",
+				"speed": 2,
+				"verticalOffset": 0.5,
+				"offset": 0.7
+			},
+			"minecraft:throwable": {
+				"do_swing_animation": true
+			},
+			"minecraft:cooldown": {
+				"category": "tome_charge",
+				"duration": 10
+			}
+		}
+	}
+}

@@ -1,0 +1,11 @@
+{
+	"num_mip_levels": 4,
+	"padding": 8,
+	"resource_pack_name": "Stellar Forge",
+	"texture_name": "atlas.terrain",
+	"texture_data": {
+		"stellar_neonite_ore": {
+			"textures": "textures/blocks/neonite_ore"
+		}
+	}
+}

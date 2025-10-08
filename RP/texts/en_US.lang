@@ -1,0 +1,14 @@
+pack.name=Stellar Forge RP
+pack.description=
+tile.stellar:neonite_ore.name=Neonite Ore
+item.stellar:neonite_crystal=Neonite Crystal
+item.stellar:neonite_pickaxe=Neonite Pickaxe
+item.stellar:neonite_sword=Neonite Sword
+item.stellar:neonite_armor_helmet=Neonite Armor Helmet
+item.stellar:neonite_armor_chestplate=Neonite Armor Chestplate
+item.stellar:neonite_armor_leggings=Neonite Armor Leggings
+item.stellar:neonite_armor_boots=Neonite Armor Boots
+item.stellar:ga=Se borra
+item.stellar:neonite_blaster=Neonite Blaster
+
+entity.stellar:thrown_neonite_blaster.name=Neonite Blaster

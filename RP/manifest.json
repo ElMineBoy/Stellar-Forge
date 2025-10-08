@@ -1,0 +1,52 @@
+{
+	"format_version": 2,
+	"metadata": {
+		"authors": [
+			"mineboy."
+		],
+		"generated_with": {
+			"bridge": [
+				"2.7.51"
+			],
+			"dash": [
+				"0.11.7"
+			]
+		}
+	},
+	"header": {
+		"name": "pack.name",
+		"description": "pack.description",
+		"min_engine_version": [
+			1,
+			21,
+			90
+		],
+		"uuid": "dfd0cc89-5077-43d1-b827-212ebdd37f4d",
+		"version": [
+			1,
+			0,
+			0
+		]
+	},
+	"modules": [
+		{
+			"type": "resources",
+			"uuid": "188cdbad-095e-4508-b7de-f170d10778b0",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	],
+	"dependencies": [
+		{
+			"uuid": "384b3f9b-5b9b-42da-b440-379d91db7993",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	]
+}

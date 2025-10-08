@@ -1,0 +1,67 @@
+{
+	"format_version": 2,
+	"metadata": {
+		"authors": [
+			"mineboy."
+		],
+		"generated_with": {
+			"bridge": [
+				"2.7.51"
+			],
+			"dash": [
+				"0.11.7"
+			]
+		}
+	},
+	"header": {
+		"name": "pack.name",
+		"description": "pack.description",
+		"min_engine_version": [
+			1,
+			21,
+			90
+		],
+		"uuid": "384b3f9b-5b9b-42da-b440-379d91db7993",
+		"version": [
+			1,
+			0,
+			0
+		]
+	},
+	"modules": [
+		{
+			"type": "data",
+			"uuid": "a3bee3e4-5657-4e39-a765-2d39fec69aa6",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"type": "script",
+			"language": "javascript",
+			"uuid": "948a4914-1868-4c48-9e0d-d5d72bf1d6ad",
+			"entry": "scripts/main.js",
+			"version": [
+				1,
+				0,
+				0
+			]
+		}
+	],
+	"dependencies": [
+		{
+			"uuid": "dfd0cc89-5077-43d1-b827-212ebdd37f4d",
+			"version": [
+				1,
+				0,
+				0
+			]
+		},
+		{
+			"module_name": "@minecraft/server",
+			"version": "2.3.0-beta"
+		}
+	]
+}

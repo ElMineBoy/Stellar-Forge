@@ -1,0 +1,68 @@
+{
+	"format_version": "1.20.80",
+	"minecraft:item": {
+		"description": {
+			"identifier": "stellar:neonite_pickaxe",
+			"menu_category": {
+				"category": "equipment",
+				"group": "itemGroup.name.pickaxe"
+			}
+		},
+		"components": {
+			"minecraft:max_stack_size": 1,
+			"minecraft:hand_equipped": true,
+			"minecraft:durability": {
+				"max_durability": 2500
+			},
+			"minecraft:icon": "stellar_neonite_pickaxe",
+			"minecraft:repairable": {
+				"repair_items": [
+					{
+						"items": [
+							"stellar:neonite_crystal"
+						],
+						"repair_amount": "query.max_durability*0.25"
+					},
+					{
+						"items": [
+							"stellar:neonite_pickaxe"
+						],
+						"repair_amount": "context.other->query.remaining_durability+0.12*context.other->query.max_durability"
+					}
+				]
+			},
+			"minecraft:damage": 3,
+			"minecraft:enchantable": {
+				"value": 14,
+				"slot": "pickaxe"
+			},
+			"minecraft:glint": true,
+			"minecraft:digger": {
+				"use_efficiency": true,
+				"destroy_speeds": [
+					{
+						"block": {
+							"tags": "query.any_tag('stone', 'metal', 'iron_pick_diggable', 'minecraft:iron_tier_destructible','minecraft:is_pickaxe_item_destructible')"
+						},
+						"speed": 50
+					},
+					{
+						"block": "minecraft:ice",
+						"speed": 50
+					},
+					{
+						"block": "minecraft:sandstone",
+						"speed": 50
+					}
+				]
+			},
+			"minecraft:tags": {
+				"tags": [
+					"minecraft:is_pickaxe",
+					"minecraft:is_tool",
+					"minecraft:iron_tier"
+				]
+			}
+		}
+	}
+}

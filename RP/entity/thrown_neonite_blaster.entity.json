@@ -1,0 +1,28 @@
+{
+	"format_version": "1.20.80",
+	"minecraft:client_entity": {
+		"description": {
+			"identifier": "stellar:thrown_neonite_blaster",
+			"materials": {
+				"default": "snowball"
+			},
+			"textures": {
+				"default": "textures/items/neonite_blaster"
+			},
+			"geometry": {
+				"default": "geometry.item_sprite"
+			},
+			"render_controllers": [
+				"controller.render.item_sprite"
+			],
+			"animations": {
+				"flying": "animation.actor.billboard"
+			},
+			"scripts": {
+				"animate": [
+					"flying"
+				]
+			}
+		}
+	}
+}

@@ -1,0 +1,79 @@
+{
+	"format_version": "1.20.80",
+	"minecraft:item": {
+		"description": {
+			"identifier": "stellar:neonite_sword",
+			"menu_category": {
+				"category": "equipment",
+				"group": "itemGroup.name.sword"
+			}
+		},
+		"components": {
+			"minecraft:glint": true,
+			"minecraft:max_stack_size": 1,
+			"minecraft:hand_equipped": true,
+			"minecraft:can_destroy_in_creative": false,
+			"minecraft:durability": {
+				"max_durability": 999
+			},
+			"minecraft:icon": "stellar_neonite_sword",
+			"minecraft:damage": 15,
+			"minecraft:enchantable": {
+				"value": 14,
+				"slot": "sword"
+			},
+			"stellar:use_modifiers": {
+				"sound": "mob.ghast.fireball",
+				"hasCooldown": true
+			},
+			"stellar:shoot_projectile": {
+				"projectileId": ":stellar:custom_fireball",
+				"speed": 2,
+				"verticalOffset": 0.5,
+				"offset": 0.7
+			},
+			"minecraft:throwable": {
+				"do_swing_animation": true
+			},
+			"minecraft:cooldown": {
+				"category": "tome_charge",
+				"duration": 10
+			},
+			"minecraft:repairable": {
+				"repair_items": [
+					{
+						"items": [
+							"stellar:neonite_crystal"
+						],
+						"repair_amount": "query.max_durability*0.25"
+					},
+					{
+						"items": [
+							"stellar:neonite_sword"
+						],
+						"repair_amount": "context.other->query.remaining_durability+0.12*context.other->query.max_durability"
+					}
+				]
+			},
+			"minecraft:digger": {
+				"use_efficiency": true,
+				"destroy_speeds": [
+					{
+						"block": "minecraft:web",
+						"speed": 15
+					},
+					{
+						"block": "minecraft:bamboo",
+						"speed": 60
+					}
+				]
+			},
+			"minecraft:tags": {
+				"tags": [
+					"minecraft:is_sword",
+					"minecraft:is_tool"
+				]
+			}
+		}
+	}
+}

@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_sword"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "#X#",
+      "#X#",
+      "#S#"
+    ],
+    "key": {
+      "S": {
+        "item": "minecraft:stick"
+      },
+      "X": {
+        "item": "stellar:neonite_crystal"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_pickaxe"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_sword",
+      "data": 0
+    }
+  }
+}

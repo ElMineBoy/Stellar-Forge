@@ -1,5 +1,5 @@
 import { system, world } from '@minecraft/server';
-import { shootProjectile } from "scripts/functions.js"
+import { shootProjectile } from "functions.js"
 
 system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
 

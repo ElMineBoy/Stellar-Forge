@@ -1,5 +1,8 @@
 import { world, system, ItemStack, EquipmentSlot } from "@minecraft/server";
 
+import "item_components.js"
+
+
 function parseOre(id) {
     const [namespace, name] = id.split(":");
     if (!name) return id; // Si no tiene nombre, devolvemos tal cual

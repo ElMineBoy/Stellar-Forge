@@ -1,5 +1,5 @@
 import { system, world } from '@minecraft/server';
-import { shootProjectile } from "utils/functions.js"
+import { shootProjectile } from "scripts/functions.js"
 
 system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
 
@@ -81,7 +81,7 @@ system.beforeEvents.startup.subscribe(({ itemComponentRegistry }) => {
         }
     })
 
-    itemComponentRegistry.registerCustomComponent("stellar:shoot_projectile", {
+    itemComponentRegistry.registerCustomComponent("eu:shoot_projectile", {
         /**
          * params:
          * - projectileId: string (entity typeId, e.g. "minecraft:arrow")

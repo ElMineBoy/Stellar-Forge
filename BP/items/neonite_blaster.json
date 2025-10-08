@@ -14,14 +14,14 @@
 			"minecraft:display_name": {
 				"value": "Neonite Blaster"
 			},
-			"stellar:use_modifiers": {
+			"eu:use_modifiers": {
 				"sound": "mob.ghast.fireball",
 				"hasCooldown": true
 			},
 			"minecraft:durability": {
 				"max_durability": 500
 			},
-			"stellar:shoot_projectile": {
+			"eu:shoot_projectile": {
 				"projectileId": "stellar:custom_fireball",
 				"speed": 2,
 				"verticalOffset": 0.5,

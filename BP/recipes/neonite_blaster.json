@@ -1,0 +1,42 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_blaster"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NRN",
+      "ICI",
+      "#S#"
+    ],
+    "key": {
+      "S": {
+        "item": "minecraft:stick"
+      },
+      "N": {
+        "item": "stellar:neonite_crystal"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      },
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "C": {
+        "item": "minecraft:lapis_lazuli"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_pickaxe"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_blaster",
+      "data": 0
+    }
+  }
+}

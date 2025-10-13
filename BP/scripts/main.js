@@ -3,6 +3,8 @@ import { world, system, ItemStack, EquipmentSlot } from "@minecraft/server";
 import "item_components.js"
 
 
+
+
 function parseOre(id) {
     const [namespace, name] = id.split(":");
     if (!name) return id; // Si no tiene nombre, devolvemos tal cual
@@ -148,6 +150,9 @@ world.beforeEvents.itemUse.subscribe(event => {
     // 📍 Dirección a donde mira el jugador
     const direction = player.getViewDirection();
 
+    const horizontalForce = { x: 4, z: 4 }; // horizontal knockback strength - xz vector
+    const verticalStrength = 0.3;           // upward knockback strength
+
 
     // ✨ Efectos visuales del dash
     const { x, y, z } = player.location;
@@ -171,6 +176,15 @@ world.beforeEvents.itemUse.subscribe(event => {
                 entity.applyDamage(DASH_DAMAGE, { cause: "entityAttack", damagingEntity: player });
             }
         }
+
+        const direction = player.getViewDirection(); // Vector unitario (x, y, z)
+        const force = 2.5; // Ajusta la fuerza del impulso
+
+        player.applyImpulse({
+            x: direction.x * force,
+            y: direction.y * force * 0.3, // Un poco de elevación opcional
+            z: direction.z * force
+        });
 
         // 💪 Buff corto al jugador
         player.addEffect("strength", 60, { amplifier: 2, showParticles: false });
@@ -216,11 +230,24 @@ const flyingState = new Map(); // player.id → true/false
 
 // 🚫 Cancelar daño por caída si lleva la armadura
 world.afterEvents.entityHurt.subscribe((event) => {
-    const { damageSource, hurtEntity } = event;
+    const { damageSource, hurtEntity, damage } = event;
+
     if (hurtEntity.typeId !== "minecraft:player") return;
-    if (damageSource.cause === "fall" && hasFullNeoniteArmor(hurtEntity)) {
-        event.cancel = true;
+    if (damageSource.cause !== "fall") return;
+    if (!hasFullNeoniteArmor(hurtEntity)) return;
+
+    // 🔄 Revertir el daño inmediatamente
+    const health = hurtEntity.getComponent("minecraft:health");
+    if (health) {
+        const current = health.currentValue;
+        const max = health.effectiveMax;
+        const newHealth = Math.min(current + damage, max);
+        health.setCurrentValue(newHealth);
     }
+
+    // ✨ Pequeño efecto visual
+    const { x, y, z } = hurtEntity.location;
+    hurtEntity.runCommand(`particle minecraft:sonic_explosion_emitter ${x} ${y} ${z}`);
 });
 
 // 🌀 Loop principal cada 5 ticks (0.25 s)
@@ -234,38 +261,175 @@ system.runInterval(() => {
             continue;
         }
 
-        // Aplicar efectos base
+        // Aplicar efectos base (visión nocturna, fuerza, etc.)
         applyNeoniteArmorEffects(player);
 
         const isSneaking = player.isSneaking;
         const isFlying = flyingState.get(player.id) === true;
 
         if (isSneaking) {
-            // 🧨 Al aterrizar → pequeña explosión visual
-            if (isFlying) {
+            // 🕊 Mantener vuelo mientras esté agachado
+            player.addEffect("levitation", 10, { amplifier: 1, showParticles: false }); // se renueva cada 5 ticks
+
+            if (!isFlying) {
+                flyingState.set(player.id, true);
+
+                // 🌟 Efectos visuales y sonido solo al despegar
                 const { x, y, z } = player.location;
-                system.runTimeout(() => {
-                    player.runCommand(`particle minecraft:sonic_explosion_emitter ${x} ${y} ${z}`);
-                    player.runCommand(`playsound random.explode @a ${x} ${y} ${z} 1 1.5`);
-                }, 1);
-
-                player.removeEffect("levitation");
-                flyingState.set(player.id, false);
+                player.runCommand(`particle minecraft:endrod ${x} ${y - 0.5} ${z}`);
+                player.runCommand(`particle minecraft:enchanting_table_particle ${x} ${y - 0.2} ${z}`);
+                player.runCommand(`playsound mob.enderdragon.flap @a ${x} ${y} ${z} 1 1.2`);
             }
-        } else {
-            // 🕊 Activar vuelo + 🌟 estela luminosa
-            player.addEffect("levitation", 60, { amplifier: 1, showParticles: false });
-            flyingState.set(player.id, true);
-
+        } else if (isFlying) {
+            // 🧨 Aterriza cuando deja de agacharse
             const { x, y, z } = player.location;
-            player.runCommand(`particle minecraft:endrod ${x} ${y - 0.5} ${z}`);
-            player.runCommand(`particle minecraft:enchanting_table_particle ${x} ${y - 0.2} ${z}`);
+            system.runTimeout(() => {
+                player.runCommand(`particle minecraft:sonic_explosion_emitter ${x} ${y} ${z}`);
+                player.runCommand(`playsound random.explode @a ${x} ${y} ${z} 1 1.5`);
+            }, 1);
+
+            player.removeEffect("levitation");
+            flyingState.set(player.id, false);
         }
     }
 }, 5);
 
 
+const BLUE_PLATE = "stellar:neonite_blue_plate";
+const ORANGE_PLATE = "stellar:neonite_orange_plate";
+const DATA_KEY = "stellar:portal_data"; // clave del dynamic property
 
+let platePositionsByDim = {}; // memoria temporal
 
+// --- Cargar desde Dynamic Property ---
+function loadPlates() {
+    try {
+        const data = world.getDynamicProperty(DATA_KEY);
+        if (data) {
+            platePositionsByDim = JSON.parse(data);
+            world.sendMessage("§a✔ Coordenadas de portales restauradas correctamente.");
+        } else {
+            platePositionsByDim = {};
+        }
+    } catch (e) {
+        console.error("Error al cargar coordenadas:", e);
+        platePositionsByDim = {};
+    }
+}
 
+// --- Guardar en Dynamic Property ---
+function savePlates() {
+    try {
+        world.setDynamicProperty(DATA_KEY, JSON.stringify(platePositionsByDim));
+    } catch (e) {
+        console.error("Error al guardar coordenadas:", e);
+    }
+}
 
+// --- Asegura que cada dimensión tenga su registro ---
+function ensureDimRecord(dim) {
+    const id = dim?.id ?? "unknown";
+    if (!platePositionsByDim[id]) {
+        platePositionsByDim[id] = { blue: null, orange: null };
+    }
+    return platePositionsByDim[id];
+}
+
+// --- Teletransporte con efectos ---
+function teleportPlayerTo(player, targetLocation) {
+    if (!targetLocation) return;
+    const dim = player.dimension;
+    const tx = targetLocation.x + 0.5;
+    const ty = targetLocation.y + 1;
+    const tz = targetLocation.z + 0.5;
+
+    const px = player.location.x;
+    const py = player.location.y;
+    const pz = player.location.z;
+
+    player.runCommand(`particle minecraft:portal_reverse_particle ${px} ${py + 1} ${pz}`);
+    player.runCommand(`playsound mob.enderman.portal @a ${px} ${py} ${pz} 1 1.5`);
+
+    player.teleport({ x: tx, y: ty, z: tz }, dim);
+    player.runCommand(`particle minecraft:portal_reverse_particle ${tx} ${ty} ${tz}`);
+}
+
+// --- Carga inicial (al iniciar el script) ---
+system.runTimeout(() => {
+    loadPlates();
+}, 20); // 1 segundo después de cargar el mundo
+
+// --- Bucle principal ---
+system.runInterval(() => {
+    for (const player of world.getAllPlayers()) {
+        const dim = player.dimension;
+        const dimRecord = ensureDimRecord(dim);
+
+        const blockUnder = dim.getBlock({
+            x: Math.floor(player.location.x),
+            y: Math.floor(player.location.y - 0.5),
+            z: Math.floor(player.location.z)
+        });
+
+        if (!blockUnder) continue;
+        const id = blockUnder.typeId;
+
+        // Guardar coordenadas
+        if (id === BLUE_PLATE) {
+            dimRecord.blue = blockUnder.location;
+            savePlates();
+        } else if (id === ORANGE_PLATE) {
+            dimRecord.orange = blockUnder.location;
+            savePlates();
+        }
+
+        // Teletransportes
+        if (id === BLUE_PLATE && dimRecord.orange) {
+            teleportPlayerTo(player, dimRecord.orange);
+        } else if (id === ORANGE_PLATE && dimRecord.blue) {
+            teleportPlayerTo(player, dimRecord.blue);
+        }
+    }
+}, 6);
+
+const NEONITE_CREEPER_ID = "stellar:neonite_creeper";
+
+world.beforeEvents.explosion.subscribe(event => {
+    const source = event.source;
+    if (!source || source.typeId !== NEONITE_CREEPER_ID) return;
+
+    const dimension = source.dimension;
+    const creeperLoc = source.location;
+
+    const nearbyPlayers = dimension.getPlayers({ location: creeperLoc, maxDistance: 6 });
+    if (nearbyPlayers.length === 0) return;
+
+    for (const player of nearbyPlayers) {
+        for (let i = 0; i < 10; i++) { // hasta 10 intentos de encontrar espacio seguro
+            const randomX = player.location.x + (Math.random() * 50 - 5);
+            const randomY = player.location.y + (Math.random() * 5 - 2);
+            const randomZ = player.location.z + (Math.random() * 10 - 5);
+
+            const block = dimension.getBlock({
+                x: Math.floor(randomX),
+                y: Math.floor(randomY),
+                z: Math.floor(randomZ)
+            });
+            const blockAbove = dimension.getBlock({
+                x: Math.floor(randomX),
+                y: Math.floor(randomY + 1),
+                z: Math.floor(randomZ)
+            });
+
+            // ✅ Solo se teletransporta si ambos bloques son aire
+            if (block?.isAir && blockAbove?.isAir) {
+                system.runTimeout(() => {
+                    try {
+                        player.teleport({ x: randomX, y: randomY, z: randomZ }, { dimension: player.dimension });
+                    } catch { }
+                }, 5);
+                break;
+            }
+        }
+    }
+});

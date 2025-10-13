@@ -6,6 +6,12 @@
 	"texture_data": {
 		"stellar_neonite_ore": {
 			"textures": "textures/blocks/neonite_ore"
+		},
+		"neonite_blue_plate": {
+			"textures": "textures/blocks/neonite_blue_plate"
+		},
+		"neonite_orange_plate": {
+			"textures": "textures/blocks/neonite_orange_plate"
 		}
 	}
 }

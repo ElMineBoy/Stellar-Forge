@@ -5,7 +5,7 @@
 			"identifier": "stellar:neonite_blaster",
 			"menu_category": {
 				"category": "equipment",
-				"group": "stellar:itemGroup.name"
+				//"group": "stellar:itemGroup.name"
 			}
 		},
 		"components": {
@@ -32,7 +32,7 @@
 			},
 			"minecraft:cooldown": {
 				"category": "tome_charge",
-				"duration": 10
+				"duration": 1
 			}
 		}
 	}

@@ -12,3 +12,5 @@ item.stellar:ga=Se borra
 item.stellar:neonite_blaster=Neonite Blaster
 
 entity.stellar:thrown_neonite_blaster.name=Neonite Blaster
+item.spawn_egg.entity.stellar:data_holder.name=Spawn Data Holder
+entity.stellar:data_holder.name=Data Holder

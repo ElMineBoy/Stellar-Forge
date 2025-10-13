@@ -1,0 +1,33 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_orange_plate"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "#X#",
+      "#S#",
+      "###"
+    ],
+    "key": {
+      "S": {
+        "item": "stellar:neonite_crystal"
+      },
+      "X": {
+        "item": "minecraft:orange_dye"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_orange_plate"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_orange_plate",
+      "data": 0
+    }
+  }
+}

@@ -28,6 +28,33 @@
 		},
 		"stellar_neonite_blaster": {
 			"textures": "textures/items/neonite_blaster"
+		},
+		"stellar_neonite_blue_apple": {
+			"textures": "textures/items/neonite_blue_apple"
+		},
+		"stellar_neonite_red_apple": {
+			"textures": "textures/items/neonite_red_apple"
+		},
+		"stellar_neonite_locator": {
+			"textures": "textures/items/neonite_locator"
+		},
+		"stellar_neonite_overcharger": {
+			"textures": "textures/items/neonite_overcharger"
+		},
+		"stellar_neonite_axe": {
+			"textures": "textures/items/neonite_axe"
+		},
+		"stellar_arbor_core": {
+			"textures": "textures/items/arbor_core"
+		},
+		"stellar_neonite_stabilizer": {
+			"textures": "textures/items/neonite_stabilizer"
+		},
+		"stellar_neonite_hydrosphere": {
+			"textures": "textures/items/neonite_hydrosphere"
+		},
+		"stellar_neonite_aqua_stepper": {
+			"textures": "textures/items/neonite_aqua_stepper"
 		}
 	}
 }

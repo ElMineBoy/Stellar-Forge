@@ -2,16 +2,16 @@
 	"format_version": "1.21.90",
 	"minecraft:item": {
 		"description": {
-			"identifier": "stellar:neonite_blaster",
+			"identifier": "stellar:neonite_hydrosphere",
 			"menu_category": {
 				"category": "equipment"
 			}
 		},
 		"components": {
 			"minecraft:max_stack_size": 1,
-			"minecraft:icon": "stellar_neonite_blaster",
+			"minecraft:icon": "stellar_neonite_hydrosphere",
 			"minecraft:display_name": {
-				"value": "Neonite Blaster"
+				"value": "Neonite Hydrosphere"
 			},
 			"eu:use_modifiers": {
 				"sound": "mob.ghast.fireball",
@@ -21,7 +21,7 @@
 				"max_durability": 500
 			},
 			"eu:shoot_projectile": {
-				"projectileId": "stellar:custom_fireball",
+				"projectileId": "stellar:custom_waterball",
 				"speed": 2,
 				"verticalOffset": 0.5,
 				"offset": 0.7
@@ -32,7 +32,8 @@
 			"minecraft:cooldown": {
 				"category": "tome_charge",
 				"duration": 1
-			}
+			},
+			"minecraft:glint": true
 		}
 	}
 }

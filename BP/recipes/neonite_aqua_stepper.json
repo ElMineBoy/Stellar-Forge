@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_aqua_stepper"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NRN",
+      "ICI",
+      "###"
+    ],
+    "key": {
+      "N": {
+        "item": "minecraft:packed_ice"
+      },
+      "R": {
+        "item": "minecraft:diamond"
+      },
+      "I": {
+        "item": "stellar:neonite_crystal"
+      },
+      "C": {
+        "item": "minecraft:glowstone_dust"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_aqua_stepper"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_aqua_stepper",
+      "data": 0
+    }
+  }
+}

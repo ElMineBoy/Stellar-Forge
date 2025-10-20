@@ -1,1 +1,39 @@
-{}
+{
+    "entity_sounds": {
+        "entities": {
+            "stellar:neonite_creeper": {
+                "events": {
+                    "death": "mob.creeper.death",
+                    "fuse": {
+                        "pitch": 0.5,
+                        "sound": "random.fuse",
+                        "volume": 1
+                    },
+                    "hurt": "mob.creeper.say"
+                },
+                "pitch": [
+                    0.8,
+                    1.2
+                ],
+                "volume": 1
+            },
+            "stellar:neonite_zombie": {
+                "events": {
+                    "ambient": "mob.zombie.say",
+                    "death": "mob.zombie.death",
+                    "hurt": "mob.zombie.hurt",
+                    "step": {
+                        "pitch": 1,
+                        "sound": "mob.zombie.step",
+                        "volume": 0.45
+                    }
+                },
+                "pitch": [
+                    0.8,
+                    1.2
+                ],
+                "volume": 1
+            }
+        }
+    }
+}

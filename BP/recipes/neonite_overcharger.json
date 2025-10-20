@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_overcharger"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "#R#",
+      "INI",
+      "#S#"
+    ],
+    "key": {
+      "S": {
+        "item": "minecraft:blaze_rod"
+      },
+      "N": {
+        "item": "stellar:neonite_crystal"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      },
+      "I": {
+        "item": "minecraft:iron_ingot"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_overcharger"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_overcharger",
+      "data": 0
+    }
+  }
+}

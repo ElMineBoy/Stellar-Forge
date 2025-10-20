@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:arbor_core"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NRN",
+      "ICI",
+      "###"
+    ],
+    "key": {
+      "N": {
+        "item": "stellar:neonite_crystal"
+      },
+      "R": {
+        "item": "minecraft:sapling"
+      },
+      "I": {
+        "item": "minecraft:log"
+      },
+      "C": {
+        "item": "minecraft:emerald"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_pickaxe"
+      }
+    ],
+    "result": {
+      "item": "stellar:arbor_core",
+      "data": 0
+    }
+  }
+}

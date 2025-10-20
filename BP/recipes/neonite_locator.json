@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_locator"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NRN",
+      "ICI",
+      "###"
+    ],
+    "key": {
+      "N": {
+        "item": "stellar:neonite_crystal"
+      },
+      "R": {
+        "item": "minecraft:redstone"
+      },
+      "I": {
+        "item": "minecraft:iron_ingot"
+      },
+      "C": {
+        "item": "minecraft:compass"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_locator"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_locator",
+      "data": 0
+    }
+  }
+}

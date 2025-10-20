@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_hydrosphere"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NRN",
+      "ICI",
+      "###"
+    ],
+    "key": {
+      "N": {
+        "item": "minecraft:tube_coral"
+      },
+      "R": {
+        "item": "minecraft:fire_coral"
+      },
+      "I": {
+        "item": "stellar:neonite_crystal"
+      },
+      "C": {
+        "item": "minecraft:heart_of_the_sea"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_hydrosphere"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_hydrosphere",
+      "data": 0
+    }
+  }
+}

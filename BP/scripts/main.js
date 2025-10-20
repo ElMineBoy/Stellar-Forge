@@ -194,6 +194,39 @@ world.beforeEvents.itemUse.subscribe(event => {
     }, 8); // pequeño delay para que golpee después de moverse
 });
 
+const BONUS_XP = 20; // 🔮 cantidad de experiencia extra al matar
+
+// 🎯 Cuando una entidad muere
+world.afterEvents.entityDie.subscribe(event => {
+    const { deadEntity, damageSource } = event;
+    if (!damageSource || !damageSource.damagingEntity) return;
+
+    const player = damageSource.damagingEntity;
+    if (!player || player.typeId !== "minecraft:player") return;
+
+    const held = player.getComponent("minecraft:equippable")?.getEquipment("Mainhand");
+    if (!held || held.typeId !== NEONITE_SWORD_ID) return;
+
+    // 🔥 Otorga experiencia directamente al jugador
+    try {
+        player.addExperience(BONUS_XP);
+    } catch (e) {
+        console.warn("No se pudo otorgar XP directamente:", e);
+    }
+
+    // 💫 Efectos visuales opcionales
+    const dim = player.dimension;
+    const { x, y, z } = deadEntity.location;
+
+    try {
+        dim.runCommand(`particle minecraft:happy_villager ${x} ${y + 1} ${z}`);
+        dim.runCommand(`playsound random.orb @a ${x} ${y} ${z} 1 1.3`);
+    } catch { }
+
+    // Mensaje de confirmación
+    player.sendMessage(`§a+${BONUS_XP} ⚡ Neonite Energy absorbed!`);
+});
+
 
 const NEONITE_ARMOR_IDS = {
     head: "stellar:neonite_armor_helmet",
@@ -433,3 +466,420 @@ world.beforeEvents.explosion.subscribe(event => {
         }
     }
 });
+
+
+world.afterEvents.itemCompleteUse.subscribe(ev => {
+
+    const { itemStack, source, useDuration } = ev
+    if (itemStack.typeId == "stellar:neonite_red_apple") {
+        source.addEffect("speed", 2400, { showParticles: true, amplifier: 3 })
+        source.addEffect("strength", 2400, { showParticles: true, amplifier: 3 })
+        source.addEffect("fire_resistance", 2400, { showParticles: true, amplifier: 3 })
+    }
+    else if (itemStack.typeId == "stellar:neonite_blue_apple") {
+        source.addEffect("absorption", 2400, { showParticles: true, amplifier: 1 });
+        source.addEffect("night_vision", 2400, { showParticles: true, amplifier: 1 });
+        source.addEffect("regeneration", 2400, { showParticles: true, amplifier: 1 });
+    }
+})
+
+
+const NEONITE_BLOCK_ID = "stellar:neonite_ore";
+const NEONITE_COMPASS_ID = "stellar:neonite_locator";
+
+// Detectar cuando el jugador usa la brújula
+world.beforeEvents.itemUse.subscribe(event => {
+    const player = event.source;
+    const item = event.itemStack;
+    if (!player || !item) return;
+    if (item.typeId !== NEONITE_COMPASS_ID) return;
+
+    const nearest = findNearestNeonite(player);
+
+    if (nearest) {
+        const { x, y, z, distance } = nearest;
+        player.sendMessage(`§b🧭 Neonite detected at §fX:${x} Y:${y} Z:${z} §7(${distance.toFixed(1)} blocks away)`);
+        player.playSound("random.orb");
+    } else {
+        player.sendMessage("§c❌ No Neonite block found nearby!");
+    }
+});
+
+function findNearestNeonite(player, radius = 20) {
+    const dim = player.dimension;
+    const { x, y, z } = player.location;
+
+    let nearest = null;
+    let minDist = Infinity;
+
+    for (let dx = -radius; dx <= radius; dx++) {
+        for (let dy = -radius; dy <= radius; dy++) {
+            for (let dz = -radius; dz <= radius; dz++) {
+                const bx = Math.floor(x + dx);
+                const by = Math.floor(y + dy);
+                const bz = Math.floor(z + dz);
+
+                const block = dim.getBlock({ x: bx, y: by, z: bz });
+                if (!block) continue;
+                if (block.typeId === NEONITE_BLOCK_ID) {
+                    const dist = Math.sqrt(dx * dx + dy * dy + dz * dz);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        nearest = { x: bx, y: by, z: bz, distance: dist };
+                    }
+                }
+            }
+        }
+    }
+
+    return nearest;
+}
+
+const OVERCHARGER_ID = "stellar:neonite_overcharger";
+
+world.afterEvents.itemUse.subscribe(event => {
+    const { source, itemStack } = event;
+    if (!source || !itemStack) return;
+    if (itemStack.typeId !== OVERCHARGER_ID) return;
+
+    const player = source;
+    const dim = player.dimension;
+    const viewDir = player.getViewDirection();
+
+    // 🔥 Solo dirección horizontal (XZ)
+    const dirX = viewDir.x;
+    const dirZ = viewDir.z;
+
+    const length = Math.sqrt(dirX * dirX + dirZ * dirZ);
+    const nx = dirX / length;
+    const nz = dirZ / length;
+
+    // 📏 Detecta la altura del suelo debajo del jugador
+    const belowBlock = dim.getBlock({
+        x: Math.floor(player.location.x),
+        y: Math.floor(player.location.y) - 1,
+        z: Math.floor(player.location.z)
+    });
+
+    // Usa esa altura como referencia
+    const groundY = belowBlock ? belowBlock.location.y + 1 : Math.floor(player.location.y - 1);
+
+    // 🔥 Crea una línea horizontal de 5 bloques al frente del jugador
+    for (let i = 1; i <= 5; i++) {
+        const fireX = Math.floor(player.location.x + nx * i);
+        const fireY = groundY;
+        const fireZ = Math.floor(player.location.z + nz * i);
+
+        const block = dim.getBlock({ x: fireX, y: fireY, z: fireZ });
+        const below = dim.getBlock({ x: fireX, y: fireY - 1, z: fireZ });
+
+        if (block && below && block.isAir && !below.isAir) {
+            try {
+                block.setType("minecraft:fire");
+            } catch { }
+        }
+    }
+});
+
+
+system.runInterval(() => {
+    for (const player of world.getAllPlayers()) {
+        const item = player.getComponent("minecraft:equippable")?.getEquipment("Mainhand");
+
+        if (item && item.typeId === OVERCHARGER_ID) {
+            // Aplica resistencia al fuego constantemente (renueva cada 2 seg)
+            player.addEffect("fire_resistance", 40, { amplifier: 0, showParticles: false });
+        }
+    }
+}, 20);
+
+const NEONITE_AXE_ID = "stellar:neonite_axe"; // ajusta a tu id
+
+function isLogBlockById(id) {
+    if (!id) return false;
+    return id.includes("log") || id.includes("stem");
+}
+
+function breakConnectedLogsWithDrops(dimension, startPos, visited = new Set()) {
+    const key = `${startPos.x},${startPos.y},${startPos.z}`;
+    if (visited.has(key)) return;
+    visited.add(key);
+
+    const blk = dimension.getBlock(startPos);
+    const typeId = blk?.typeId ?? "";
+
+    if (!isLogBlockById(typeId)) return;
+
+    // Guardamos tipo antes de borrar
+    try {
+        // Extraer la posible item id del mismo nombre (usualmente coincide)
+        const itemId = typeId; // ej. "minecraft:oak_log" -> item "minecraft:oak_log"
+        // Quitar el bloque
+        blk.setType("minecraft:air");
+        // Generar drop (1 por bloque)
+        try {
+            const drop = new ItemStack(itemId, 1);
+            dimension.spawnItem(drop, { x: startPos.x + 0.5, y: startPos.y + 0.5, z: startPos.z + 0.5 });
+        } catch (e) {
+            // si no pudo crear ItemStack por motivo X, solo seguimos
+            console.warn("No se pudo spawnItem:", e);
+        }
+    } catch (e) {
+        console.warn("Error al setType air:", e);
+        return;
+    }
+
+    const neighbors = [
+        { dx: 1, dy: 0, dz: 0 }, { dx: -1, dy: 0, dz: 0 },
+        { dx: 0, dy: 1, dz: 0 }, { dx: 0, dy: -1, dz: 0 },
+        { dx: 0, dy: 0, dz: 1 }, { dx: 0, dy: 0, dz: -1 },
+        { dx: 1, dy: 1, dz: 0 }, { dx: -1, dy: 1, dz: 0 },
+        { dx: 0, dy: 1, dz: 1 }, { dx: 0, dy: 1, dz: -1 }
+    ];
+
+    for (const n of neighbors) {
+        const pos = { x: startPos.x + n.dx, y: startPos.y + n.dy, z: startPos.z + n.dz };
+        const adj = dimension.getBlock(pos);
+        if (adj && isLogBlockById(adj.typeId)) breakConnectedLogsWithDrops(dimension, pos, visited);
+    }
+}
+
+world.beforeEvents.playerBreakBlock.subscribe(event => {
+    const player = event.player;
+    const block = event.block; // bloque objetivo (antes de romper)
+    if (!player || !block) return;
+
+    const held = player.getComponent("minecraft:equippable")?.getEquipment("Mainhand");
+    if (!held || held.typeId !== NEONITE_AXE_ID) return;
+
+    // Solo si está agachado
+    if (!player.isSneaking) return;
+
+    const typeId = block.typeId ?? "";
+    if (!isLogBlockById(typeId)) return;
+
+    // debug
+    console.warn("Treecapitator triggered (before break). Block:", typeId, "at", block.location);
+
+    // Cancelamos el rompimiento normal y hacemos el treecap
+    event.cancel = true;
+
+    // Ejecutar con un pequeño delay para evitar conflictos con el motor
+    system.runTimeout(() => {
+        const startPos = { x: Math.floor(block.location.x), y: Math.floor(block.location.y), z: Math.floor(block.location.z) };
+        breakConnectedLogsWithDrops(player.dimension, startPos);
+    }, 1);
+});
+
+
+const ARBOR_CORE_ID = "stellar:arbor_core";
+
+// 🌱 Lista de tipos de árboles posibles
+const TREE_TYPES = [
+    "oak",
+    "birch",
+    "spruce",
+    "jungle",
+    "acacia",
+    "dark_oak"
+];
+
+// 📦 Evento al usar el Arbor Core
+world.afterEvents.itemUse.subscribe(event => {
+    const { source: player, itemStack } = event;
+    if (!player || !itemStack) return;
+    if (itemStack.typeId !== ARBOR_CORE_ID) return;
+
+    const dim = player.dimension;
+    const pos = player.location;
+
+    // 📍 Coordenadas frente al jugador
+    const dir = player.getViewDirection();
+    const x = Math.floor(pos.x + dir.x * 2);
+    const y = Math.floor(pos.y);
+    const z = Math.floor(pos.z + dir.z * 2);
+
+    // 🌳 Tipo de árbol aleatorio
+    const treeType = TREE_TYPES[Math.floor(Math.random() * TREE_TYPES.length)];
+
+    // 🪄 Generar árbol
+    try {
+        dim.runCommand(`setblock ${x} ${y} ${z} minecraft:${treeType}_sapling`);
+        dim.runCommand(`playsound random.levelup @a ${x} ${y} ${z} 1 1.2`);
+        player.sendMessage(`§a🌳 Un árbol de tipo §l${treeType}§r ha brotado!`);
+    } catch {
+        player.sendMessage("§c⚠ No se pudo plantar el árbol aquí.");
+    }
+
+    // 🌟 Partículas visuales
+    system.runTimeout(() => {
+        dim.runCommand(`particle minecraft:happy_villager ${x} ${y + 1} ${z}`);
+        dim.runCommand(`particle minecraft:crop_growth_emitter ${x} ${y + 1} ${z}`);
+    }, 2);
+});
+
+
+const STABILIZER_ID = "stellar:neonite_stabilizer";
+const PLATFORM_BLOCK = "stellar:neonite_block";
+const PLATFORM_LIFETIME = 200; // 10 segundos (20 ticks por segundo)
+
+world.afterEvents.itemUse.subscribe(event => {
+    const player = event.source;
+    const item = event.itemStack;
+
+    if (!item || item.typeId !== STABILIZER_ID) return;
+
+    const dimension = player.dimension;
+    const playerY = Math.floor(player.location.y - 1);
+
+    // Verifica si el jugador está en el aire
+    const blockBelow = dimension.getBlock({
+        x: Math.floor(player.location.x),
+        y: playerY,
+        z: Math.floor(player.location.z)
+    });
+
+    if (blockBelow && blockBelow.typeId !== "minecraft:air") {
+        player.sendMessage("§7You must be in the air to use the Neonite Stabilizer.");
+        return;
+    }
+
+    // 📦 Crear plataforma 3x3 debajo del jugador
+    const px = Math.floor(player.location.x);
+    const pz = Math.floor(player.location.z);
+
+    for (let dx = -1; dx <= 1; dx++) {
+        for (let dz = -1; dz <= 1; dz++) {
+            const blockPos = { x: px + dx, y: playerY, z: pz + dz };
+            const block = dimension.getBlock(blockPos);
+            if (block && block.typeId === "minecraft:air") {
+                block.setType(PLATFORM_BLOCK);
+
+                // ⏳ Programar para eliminar el bloque después de 10 segundos
+                system.runTimeout(() => {
+                    const b = dimension.getBlock(blockPos);
+                    if (b && b.typeId === PLATFORM_BLOCK) {
+                        b.setType("minecraft:air");
+                    }
+                }, PLATFORM_LIFETIME);
+            }
+        }
+    }
+
+    player.runCommand(`playsound random.pop @a[r=10] ${player.location.x} ${player.location.y} ${player.location.z} 1 1`);
+    player.sendMessage("§b⚡ A Neonite platform has formed beneath you!");
+});
+
+world.afterEvents.projectileHitEntity.subscribe(event => {
+    const projectile = event.projectile;
+    if (!projectile) return;
+
+    // Verificamos que sea nuestro proyectil personalizado
+    if (projectile.typeId === "stellar:custom_waterball") {
+        const hit = event.getEntityHit();
+        if (!hit || !hit.entity) return;
+
+        const hitEntity = hit.entity;
+
+        try {
+            // 🌊 Efectos relacionados al agua
+            hitEntity.addEffect("slowness", 120, {
+                amplifier: 3, // como si estuviera en el agua
+                showParticles: true
+            });
+            hitEntity.addEffect("levitation", 120, {
+                amplifier: 1,
+                showParticles: false
+            });
+
+            hitEntity.addEffect("weakness", 120, {
+                amplifier: 1,
+                showParticles: false
+            });
+
+            hitEntity.addEffect("nausea", 60, {
+                amplifier: 1,
+                showParticles: false
+            });
+
+            // 💦 Si el enemigo no es acuático, también simular que se ahoga
+            hitEntity.addEffect("water_breathing", 60, {
+                amplifier: 0,
+                showParticles: false
+            });
+
+            // 💧 Partículas de salpicadura
+            const { x, y, z } = hitEntity.location;
+            hitEntity.dimension.runCommand(
+                `particle minecraft:splash_particle ${x} ${y + 1} ${z}`
+            );
+            hitEntity.dimension.runCommand(
+                `particle minecraft:bubble_column_up_particle ${x} ${y + 0.5} ${z}`
+            );
+            hitEntity.dimension.runCommand(
+                `particle minecraft:falling_water ${x} ${y + 1.2} ${z}`
+            );
+
+            // 🔊 Sonidos de impacto acuático
+            hitEntity.dimension.runCommand(
+                `playsound random.splash @a[r=16] ${x} ${y} ${z} 1 1`
+            );
+            hitEntity.dimension.runCommand(
+                `playsound mob.guardian.flop @a[r=16] ${x} ${y} ${z} 0.8 1`
+            );
+
+            // 💥 Eliminar proyectil tras el impacto
+            projectile.remove();
+
+        } catch (error) {
+            console.warn("❌ Error aplicando efectos de agua:", error);
+        }
+    }
+});
+
+
+
+system.runInterval(() => {
+    for (const player of world.getPlayers()) {
+        const item = player.getComponent("minecraft:equippable")?.getEquipment("Mainhand");
+        if (!item) continue;
+
+        // Verifica si el jugador sostiene el Neonite Aqua Stepper
+        if (item.typeId === "stellar:neonite_aqua_stepper") {
+            const { x, y, z } = player.location;
+            const bx = Math.floor(x);
+            const by = Math.floor(y - 1);
+            const bz = Math.floor(z);
+
+            // Congela un área de 3x3 debajo del jugador
+            for (let dx = -1; dx <= 1; dx++) {
+                for (let dz = -1; dz <= 1; dz++) {
+                    const block = player.dimension.getBlock({ x: bx + dx, y: by, z: bz + dz });
+                    if (!block) continue;
+
+                    // Si es agua, conviértelo temporalmente en hielo
+                    if (block.typeId === "minecraft:water") {
+                        block.setType("minecraft:ice");
+
+                        // Revertir a agua después de 10 segundos
+                        system.runTimeout(() => {
+                            const check = player.dimension.getBlock({ x: bx + dx, y: by, z: bz + dz });
+                            if (check && check.typeId === "minecraft:ice") {
+                                check.setType("minecraft:water");
+                            }
+                        }, 200);
+                    }
+                }
+            }
+
+            // Aplicar velocidad nivel 5 por 1 segundo (se renueva constantemente)
+            player.addEffect("minecraft:speed", 20, { amplifier: 4, showParticles: false });
+        }
+        else if (item.typeId === "stellar:neonite_hydrosphere") {
+            // Da respiración bajo el agua y velocidad acuática
+            player.addEffect("minecraft:water_breathing", 40, { amplifier: 0, showParticles: false });
+            player.addEffect("minecraft:speed", 40, { amplifier: 1, showParticles: false });
+        }
+    }
+
+}, 2); // Ejecuta cada 0.1 segundos (2 ticks)

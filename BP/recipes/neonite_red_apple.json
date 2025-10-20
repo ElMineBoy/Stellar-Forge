@@ -1,0 +1,36 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:neonite_red_apple"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "SSS",
+      "#X#",
+      "ZZZ"
+    ],
+    "key": {
+      "X": {
+        "item": "minecraft:apple"
+      },
+      "Z": {
+        "item": "minecraft:redstone"
+      },
+      "S": {
+        "item": "stellar:neonite_crystal"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:neonite_red_apple"
+      }
+    ],
+    "result": {
+      "item": "stellar:neonite_red_apple",
+      "data": 0
+    }
+  }
+}

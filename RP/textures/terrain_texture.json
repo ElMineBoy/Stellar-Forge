@@ -12,6 +12,9 @@
 		},
 		"neonite_orange_plate": {
 			"textures": "textures/blocks/neonite_orange_plate"
+		},
+		"neonite_block": {
+			"textures": "textures/blocks/neonite_block"
 		}
 	}
 }

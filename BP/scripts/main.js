@@ -883,3 +883,75 @@ system.runInterval(() => {
     }
 
 }, 2); // Ejecuta cada 0.1 segundos (2 ticks)
+
+const activePlayers = new Set(); // Para evitar reactivaciones simultáneas
+
+// 💫 Intervalo global que mantiene las partículas de todos los jugadores con el tag "hakari_aura"
+system.runInterval(() => {
+    const players = world.getAllPlayers();
+
+    for (const player of players) {
+        if (player.hasTag("hakari_aura")) {
+            player.dimension.spawnParticle("stellar:hakari_aura_emitter", {
+                x: player.location.x,
+                y: player.location.y + 1,
+                z: player.location.z
+            });
+        }
+    }
+}, 2); // cada 0.1 segundos
+
+// 🎯 Activación del ítem
+world.afterEvents.itemUse.subscribe(event => {
+    const player = event.source;
+    const item = event.itemStack;
+
+    if (!player || !item) return;
+    if (item.typeId !== "stellar:jackpot_shield") return;
+
+    // 🚫 Evita reactivaciones simultáneas
+    if (activePlayers.has(player.name)) {
+        player.sendMessage("§cThe JackPot Shield is already active!");
+        return;
+    }
+
+    activePlayers.add(player.name);
+
+    // 🟢 Agrega el tag para activar el aura
+    player.addTag("hakari_aura");
+
+    // 🔊 Sonido personalizado
+    player.playSound("stellar.hakari_jackpot");
+
+    // 🗨️ Mensajes narrativos progresivos
+    player.sendMessage(`§b${player.name}§r never acquired Reverse Cursed Technique...`);
+    system.runTimeout(() => {
+        player.sendMessage(`§7...but the infinite cursed energy overflowing in §b${player.name}'s§r body caused it to reflexively perform reverse cursed technique in order to not take damage.`);
+    }, 80); // 4 segundos
+    system.runTimeout(() => {
+        player.sendMessage(`§aIn other words, for 2 minutes and 11 seconds following a Jackpot, §b${player.name}§r is effectively §lIMMORTAL§r.`);
+    }, 300); // 15 segundos
+
+    const immortalityDuration = 2710; // 2 min 11 seg aprox (en ticks)
+
+    // ❤️ Mantiene al jugador con vida completa mientras esté activo
+    const healLoop = system.runInterval(() => {
+        if (!activePlayers.has(player.name)) return;
+        if (player.isValid()) {
+            const healthComp = player.getComponent("minecraft:health");
+            if (healthComp) healthComp.currentValue = healthComp.defaultValue;
+        }
+    }, 2);
+
+    // ✨ Efectos de inmortalidad
+    player.addEffect("minecraft:resistance", immortalityDuration, { amplifier: 255, showParticles: false });
+    player.addEffect("minecraft:regeneration", immortalityDuration, { amplifier: 10, showParticles: false });
+
+    // ⏳ Cuando termina el efecto, limpiamos todo
+    system.runTimeout(() => {
+        activePlayers.delete(player.name);
+        player.removeTag("hakari_aura"); // ❌ Quita el aura
+        system.clearRun(healLoop);
+        player.sendMessage("§cThe Jackpot effect has ended...");
+    }, immortalityDuration);
+});

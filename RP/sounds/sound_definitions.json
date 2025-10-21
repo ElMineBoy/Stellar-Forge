@@ -1,4 +1,15 @@
 {
 	"format_version": "1.14.0",
-	"sound_definitions": {}
+	"sound_definitions": {
+		"stellar.hakari_jackpot": {
+			"category": "ui",
+			"sounds": [
+				{
+					"name": "sounds/stellar/hakari_jackpot",
+					"volume": 1.0,
+					"pitch": 1.0
+				}
+			]
+		}
+	}
 }

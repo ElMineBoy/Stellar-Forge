@@ -55,6 +55,9 @@
 		},
 		"stellar_neonite_aqua_stepper": {
 			"textures": "textures/items/neonite_aqua_stepper"
+		},
+		"stellar_jackpot_shield": {
+			"textures": "textures/items/jackpot_shield"
 		}
 	}
 }

@@ -884,7 +884,7 @@ system.runInterval(() => {
 
 }, 2); // Ejecuta cada 0.1 segundos (2 ticks)
 
-const activePlayers = new Set(); // Para evitar reactivaciones simultáneas
+const activePlayers = new Set(); // Evita reactivaciones simultáneas
 
 // 💫 Intervalo global que mantiene las partículas de todos los jugadores con el tag "hakari_aura"
 system.runInterval(() => {
@@ -900,6 +900,14 @@ system.runInterval(() => {
         }
     }
 }, 2); // cada 0.1 segundos
+
+// 🚪 Cuando un jugador entra, se limpia cualquier tag viejo
+world.afterEvents.playerSpawn.subscribe(event => {
+    const player = event.player;
+    system.runTimeout(() => {
+        player.removeTag("hakari_aura");
+    }, 10);
+});
 
 // 🎯 Activación del ítem
 world.afterEvents.itemUse.subscribe(event => {
@@ -923,16 +931,18 @@ world.afterEvents.itemUse.subscribe(event => {
     // 🔊 Sonido personalizado
     player.playSound("stellar.hakari_jackpot");
 
+    player.playAnimation("animation.hakari_dance")
+
     // 🗨️ Mensajes narrativos progresivos
     player.sendMessage(`§b${player.name}§r never acquired Reverse Cursed Technique...`);
     system.runTimeout(() => {
-        player.sendMessage(`§7...but the infinite cursed energy overflowing in §b${player.name}'s§r body caused it to reflexively perform reverse cursed technique in order to not take damage.`);
+        player.sendMessage(`§7...but the infinite cursed energy overflowing in §b${player.name}'s§r body caused its body to reflexively perform reverse cursed technique in order to not take damage.`);
     }, 80); // 4 segundos
     system.runTimeout(() => {
-        player.sendMessage(`§aIn other words, for 2 minutes and 11 seconds following a Jackpot, §b${player.name}§r is effectively §lIMMORTAL§r.`);
+        player.sendMessage(`§aIn other words, for 4 minutes and 11 seconds following a Jackpot, §b${player.name}§r is effectively §lIMMORTAL§r.`);
     }, 300); // 15 segundos
 
-    const immortalityDuration = 2710; // 2 min 11 seg aprox (en ticks)
+    const immortalityDuration = 5020; // 2 min 11 seg aprox (en ticks)
 
     // ❤️ Mantiene al jugador con vida completa mientras esté activo
     const healLoop = system.runInterval(() => {

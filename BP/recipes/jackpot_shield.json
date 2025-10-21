@@ -1,0 +1,39 @@
+{
+  "format_version": "1.20.10",
+  "minecraft:recipe_shaped": {
+    "description": {
+      "identifier": "stellar:jackpot_shield"
+    },
+    "tags": [
+      "crafting_table"
+    ],
+    "pattern": [
+      "NRN",
+      "ICI",
+      "###"
+    ],
+    "key": {
+      "N": {
+        "item": "stellar:neonite_crystal"
+      },
+      "R": {
+        "item": "minecraft:emerald"
+      },
+      "I": {
+        "item": "minecraft:slime_ball"
+      },
+      "C": {
+        "item": "minecraft:shield"
+      }
+    },
+    "unlock": [
+      {
+        "item": "stellar:jackpot_shield"
+      }
+    ],
+    "result": {
+      "item": "stellar:jackpot_shield",
+      "data": 0
+    }
+  }
+}

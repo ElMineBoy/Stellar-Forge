@@ -5,7 +5,7 @@
 	"authors": [
 		"mineboy."
 	],
-	"targetVersion": "1.21.110",
+	"targetVersion": "1.21.120",
 	"description": "",
 	"experimentalGameplay": {
 		"creationOfCustomBiomes": false,

@@ -1,4 +1,6 @@
-import { world, system, ItemStack, EquipmentSlot } from "@minecraft/server";
+import { world, system, ItemStack, EquipmentSlot, EasingType, InputPermissionCategory, Player } from "@minecraft/server";
+import * as Vec3 from 'utils/vec3.js'
+
 
 import "item_components.js"
 
@@ -964,4 +966,234 @@ world.afterEvents.itemUse.subscribe(event => {
         system.clearRun(healLoop);
         player.sendMessage("§cThe Jackpot effect has ended...");
     }, immortalityDuration);
+});
+
+
+world.afterEvents.itemUse.subscribe(ev => {
+    const player = ev.source;
+    const item = ev.itemStack;
+    if (!player || !item) return;
+    if (item.typeId !== "stellar:neonite_flysup") return;
+
+    // SI ESTÁ EN PRE-CHARGE (animación inicial) → no dejar usar nada
+    if (player.hasTag("sup_fly_precharge")) return;
+
+    // PRIMERA VEZ → activar SUPER VUELO
+    if (!player.hasTag("sup_fly_active")) {
+
+        player.addTag("sup_fly_precharge"); // evita spam durante anim
+
+        // mensajes iniciales
+        player.sendMessage("§a Hey buddy");
+        system.runTimeout(() => {
+            player.sendMessage("§a Eyes up here.");
+
+        }, 20);
+
+        // sonido inicial (solo 1 vez)
+        player.playSound("stellar.superman_flight");
+
+        // animación de inicio
+        player.playAnimation("animation.supermanflight");
+
+        // DESPUÉS de que la anim avance → impulsarlo hacia arriba
+        system.runTimeout(() => {
+            player.dimension.spawnParticle("stellar:super_jump", {
+                x: player.location.x,
+                y: player.location.y,
+                z: player.location.z
+            });
+
+            player.applyImpulse({ x: 0, y: 4.5, z: 0 });
+
+
+            // ahora sí está en modo vuelo
+            player.removeTag("sup_fly_precharge");
+            player.addTag("sup_fly_active");
+
+            // tag para controlar el sonido de dash
+            player.removeTag("sup_fly_dash_sound_played"); // aseguramos que pueda sonar en esta sesión de vuelo
+        }, 45); // aprox 2.5s (ajusta si tu anim es más corta o más larga)
+
+        return;
+    }
+
+    // SI YA ESTÁ EN MODO VUELO → DASH
+    const dir = player.getViewDirection();
+    player.applyImpulse({
+        x: dir.x * 2,
+        y: 0.75,
+        z: dir.z * 2
+    });
+    player.playAnimation("animation.supermanflight2");
+
+    // reproducir sonido de dash solo 1 vez por vuelo
+    if (!player.hasTag("sup_fly_dash_sound_played")) {
+        player.playSound("stellar.superman_esencia");
+        player.addTag("sup_fly_dash_sound_played");
+    }
+});
+
+// si toca el suelo → termina el modo vuelo
+system.runInterval(() => {
+    for (const player of world.getAllPlayers()) {
+        if (player.hasTag("sup_fly_active") && player.isOnGround) {
+            player.removeTag("sup_fly_active");
+            player.removeTag("sup_fly_dash_sound_played"); // reset del sonido
+            player.sendMessage("§cFlight ended!");
+            player.stopSound("stellar.superman_esencia");
+        }
+    }
+}, 1);
+
+// resistencia mientras esté en vuelo
+system.runInterval(() => {
+    for (const player of world.getAllPlayers()) {
+        if (player.hasTag("sup_fly_active")) {
+            // resistance 10 por 1 segundo, se renueva cada tick
+            player.addEffect("resistance", 40, { amplifier: 10, showParticles: false });
+        }
+    }
+}, 20);
+
+
+
+const cameraSequence = [
+    {
+        location: { x: 100, y: 80, z: 100 },
+        rotation: { x: 90, y: 0 },
+        easeTime: 1,
+        easeType: EasingType.InCubic,
+        waitSeconds: 2
+    },
+    {
+        location: { x: 120, y: 85, z: 100 },
+        rotation: { x: 60, y: 90 },
+        easeTime: 2,
+        easeType: EasingType.OutCubic,
+        waitSeconds: 3
+    },
+    {
+        location: { x: 140, y: 90, z: 110 },
+        rotation: { x: 45, y: 180 },
+        easeTime: 1.5,
+        easeType: EasingType.Linear,
+        waitSeconds: 1
+    }
+];
+
+// Función para ejecutar la secuencia sin async/await
+function runCameraSequence(player, steps, index = 0) {
+    const inputPermissions = player.inputPermissions
+
+    if (index >= steps.length) {
+        player.camera.clear();
+        inputPermissions.setPermissionCategory(InputPermissionCategory.Camera, true)
+        inputPermissions.setPermissionCategory(InputPermissionCategory.Movement, true)
+        return;
+    }
+
+    const step = steps[index];
+
+    player.camera.setCamera('minecraft:free', {
+        location: step.location,
+        rotation: step.rotation,
+        facingEntity: step.facingEntity,
+        facingLocation: step.facingLocation,
+        easeOptions: {
+            easeTime: step.easeTime ?? 1,
+            easeType: step.easeType ?? EasingType.Linear
+        }
+    });
+
+    const waitTicks = Math.floor((step.waitSeconds ?? 1) * 20);
+
+    system.runTimeout(() => {
+        runCameraSequence(player, steps, index + 1);
+    }, waitTicks);
+}
+
+
+world.afterEvents.itemUse.subscribe(ev => {
+    const { itemStack, source } = ev
+
+    if (itemStack.typeId == 'minecraft:coal') {
+        source.camera.setCamera('minecraft:free', {
+            location: {
+                x: source.location.x,
+                y: source.getHeadLocation().y,
+                z: source.location.z,
+
+            },
+            easeOptions: {
+                easeTime: 1,
+                easeType: EasingType.InCubic
+            },
+            rotation: source.getRotation()
+        })
+        system.runTimeout(() => {
+            source.camera.clear()
+        }, 19)
+    }
+})
+
+
+
+
+world.afterEvents.itemUse.subscribe((ev) => {
+    const { itemStack, source } = ev;
+
+    if (!(source instanceof Player)) return;
+
+    if (itemStack.typeId == 'minecraft:stick') {
+        const { location } = source
+
+        const inputPermissions = source.inputPermissions
+        inputPermissions.setPermissionCategory(InputPermissionCategory.Camera, false)
+        inputPermissions.setPermissionCategory(InputPermissionCategory.Movement, false)
+
+        const cameraSequence1 = [
+            // 1) pegado en la cara + puño
+            {
+                // cámara al lado del puño (derecha del jugador)
+                location: Vec3.getLocalCoordinates(source, { x: 1, y: 1.5, z: -0.3 }),
+
+                // que mire a la cabeza exacto del jugador
+                facingLocation: Vec3.add(source.location, { x: 0, y: 1.6, z: 0 }),
+                easeTime: 1.5,
+                easeType: EasingType.OutCubic,
+                waitSeconds: 1
+            },
+            // 2) se aleja pero frente
+            {
+                // cámara al lado del puño (derecha del jugador)
+                location: Vec3.getLocalCoordinates(source, { x: 3, y: 1.5, z: -0.5 }),
+
+                // que mire a la cabeza exacto del jugador
+                facingLocation: Vec3.add(source.location, { x: 0, y: 1.6, z: 0 }),
+                easeTime: 1.5,
+                easeType: EasingType.OutCubic,
+                waitSeconds: 2
+            },
+            {
+                // cámara al lado del puño (derecha del jugador)
+                location: Vec3.getLocalCoordinates(source, { x: 3, y: 1.5, z: -1.5 }),
+
+                // que mire a la cabeza exacto del jugador
+                facingLocation: Vec3.add(source.location, { x: 0, y: 1.6, z: 0 }),
+                easeTime: 1.5,
+                easeType: EasingType.OutCubic,
+                waitSeconds: 2
+            },
+            // 3) rotación atrás mostrando espalda
+            {
+                location: Vec3.getLocalCoordinates(source, { x: -4, y: 2, z: 0 }),
+                facingLocation: Vec3.getLocalCoordinates(source, { x: 8, y: 2, z: 0 }),
+                easeTime: 1.5,
+                easeType: EasingType.OutCubic,
+                waitSeconds: 3
+            }
+        ];
+        runCameraSequence(source, cameraSequence1);
+    }
 });

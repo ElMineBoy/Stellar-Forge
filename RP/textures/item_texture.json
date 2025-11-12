@@ -58,6 +58,9 @@
 		},
 		"stellar_jackpot_shield": {
 			"textures": "textures/items/jackpot_shield"
+		},
+		"stellar_neonite_flysup": {
+			"textures": "textures/items/neonite_flysup"
 		}
 	}
 }

@@ -10,6 +10,26 @@
 					"pitch": 1.0
 				}
 			]
+		},
+		"stellar.superman_flight": {
+			"category": "ui",
+			"sounds": [
+				{
+					"name": "sounds/stellar/superman_flight",
+					"volume": 1.0,
+					"pitch": 1.0
+				}
+			]
+		},
+		"stellar.superman_esencia": {
+			"category": "ui",
+			"sounds": [
+				{
+					"name": "sounds/stellar/superman_esencia",
+					"volume": 1.0,
+					"pitch": 1.0
+				}
+			]
 		}
 	}
 }
